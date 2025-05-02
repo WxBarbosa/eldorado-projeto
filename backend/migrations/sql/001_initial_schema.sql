@@ -1,11 +1,10 @@
--- Script de migração para criar as tabelas `categories` e `devices`
-
-CREATE TABLE categories (
+-- Criar tabelas iniciais do sistema
+CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(128) NOT NULL
 );
 
-CREATE TABLE devices (
+CREATE TABLE IF NOT EXISTS devices (
     id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
     color VARCHAR(16) NOT NULL,
