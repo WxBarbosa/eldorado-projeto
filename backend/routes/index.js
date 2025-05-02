@@ -25,6 +25,20 @@ router.get('/categories', (req, res) => {
     });
 });
 
+// Get a single category by ID
+router.get('/categories/:id',
+    param('id').isInt().withMessage('Invalid category ID.'),
+    handleValidationErrors,
+    (req, res) => {
+        const { id } = req.params;
+        db.query('SELECT * FROM categories WHERE id = ?', [id], (err, results) => {
+            if (err) return res.status(500).send(err);
+            if (results.length === 0) return res.status(404).send('Category not found.');
+            res.json(results[0]);
+        });
+    }
+);
+
 // Create a new category
 router.post('/categories',
     body('name').isString().isLength({ min: 1, max: 128 }).withMessage('Invalid category name.'),
@@ -34,6 +48,22 @@ router.post('/categories',
         db.query('INSERT INTO categories (name) VALUES (?)', [name], (err, results) => {
             if (err) return res.status(500).send(err);
             res.status(201).json({ id: results.insertId, name });
+        });
+    }
+);
+
+// Update a category
+router.put('/categories/:id',
+    param('id').isInt().withMessage('Invalid category ID.'),
+    body('name').isString().isLength({ min: 1, max: 128 }).withMessage('Invalid category name.'),
+    handleValidationErrors,
+    (req, res) => {
+        const { id } = req.params;
+        const { name } = req.body;
+        db.query('UPDATE categories SET name = ? WHERE id = ?', [name, id], (err, results) => {
+            if (err) return res.status(500).send(err);
+            if (results.affectedRows === 0) return res.status(404).send('Category not found.');
+            res.json({ id: parseInt(id), name });
         });
     }
 );
@@ -74,6 +104,41 @@ router.get('/devices', (req, res) => {
         res.json(results);
     });
 });
+
+// Get a single device by ID
+router.get('/devices/:id',
+    param('id').isInt().withMessage('Invalid device ID.'),
+    handleValidationErrors,
+    (req, res) => {
+        const { id } = req.params;
+        db.query('SELECT * FROM devices WHERE id = ?', [id], (err, results) => {
+            if (err) return res.status(500).send(err);
+            if (results.length === 0) return res.status(404).send('Device not found.');
+            res.json(results[0]);
+        });
+    }
+);
+
+// Update a device
+router.put('/devices/:id',
+    param('id').isInt().withMessage('Invalid device ID.'),
+    body('category_id').isInt().withMessage('Invalid category ID.'),
+    body('color').isString().isLength({ max: 16 }).matches(/^[a-zA-Z]+$/).withMessage('Invalid color.'),
+    body('part_number').isInt({ min: 1 }).withMessage('Invalid part number.'),
+    handleValidationErrors,
+    (req, res) => {
+        const { id } = req.params;
+        const { category_id, color, part_number } = req.body;
+        db.query('UPDATE devices SET category_id = ?, color = ?, part_number = ? WHERE id = ?',
+            [category_id, color, part_number, id],
+            (err, results) => {
+                if (err) return res.status(500).send(err);
+                if (results.affectedRows === 0) return res.status(404).send('Device not found.');
+                res.json({ id: parseInt(id), category_id, color, part_number });
+            }
+        );
+    }
+);
 
 // Delete a device
 router.delete('/devices/:id',

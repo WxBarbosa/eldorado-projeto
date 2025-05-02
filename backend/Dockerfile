@@ -13,8 +13,12 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Create a startup script
+RUN echo '#!/bin/sh\nnode scripts/init-db.js && npm start' > start.sh
+RUN chmod +x start.sh
+
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# Use the startup script as the entry point
+CMD ["./start.sh"]
