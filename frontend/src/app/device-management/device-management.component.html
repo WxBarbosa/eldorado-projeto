@@ -1,0 +1,50 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Device Management</h2>
+  <form [formGroup]="deviceForm" (ngSubmit)="addDevice()">
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select class="form-control" id="category" formControlName="category_id">
+        <option value="">Select a category</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{category.name}}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="color" class="form-label">Color</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        id="color" 
+        formControlName="color" 
+        placeholder="Enter color (letters only)">
+    </div>
+
+    <div class="mb-3">
+      <label for="partNumber" class="form-label">Part Number</label>
+      <input 
+        type="number" 
+        class="form-control" 
+        id="partNumber" 
+        formControlName="part_number" 
+        placeholder="Enter part number">
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="!deviceForm.valid">Add Device</button>
+  </form>
+
+  <div class="mt-4">
+    <h3>Devices List</h3>
+    <div class="list-group">
+      <div *ngFor="let device of devices" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Color:</strong> {{device.color}} |
+          <strong>Part Number:</strong> {{device.part_number}} |
+          <strong>Category:</strong> {{getCategoryName(device.category_id)}}
+        </div>
+        <button class="btn btn-danger btn-sm" (click)="deleteDevice(device.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Category Management</h2>
+  <form [formGroup]="categoryForm" (ngSubmit)="addCategory()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Category Name</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        id="name" 
+        formControlName="name" 
+        placeholder="Enter category name">
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!categoryForm.valid">Add Category</button>
+  </form>
+
+  <div class="mt-4">
+    <h3>Categories List</h3>
+    <div class="list-group">
+      <div *ngFor="let category of categories" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        {{ category.name }}
+        <button class="btn btn-danger btn-sm" (click)="deleteCategory(category.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
