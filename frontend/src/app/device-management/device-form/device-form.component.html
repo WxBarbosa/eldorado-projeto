@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h2>{{isEditing ? 'Edit' : 'Create'}} Device</h2>
+  <form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select class="form-control" id="category" formControlName="category_id">
+        <option value="">Select a category</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{category.name}}
+        </option>
+      </select>
+      <div class="text-danger" *ngIf="deviceForm.get('category_id')?.errors?.['required'] && deviceForm.get('category_id')?.touched">
+        Category is required
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="color" class="form-label">Color</label>
+      <input type="text" class="form-control" id="color" formControlName="color">
+      <div class="text-danger" *ngIf="deviceForm.get('color')?.errors?.['required'] && deviceForm.get('color')?.touched">
+        Color is required
+      </div>
+      <div class="text-danger" *ngIf="deviceForm.get('color')?.errors?.['maxlength']">
+        Color cannot exceed 16 characters
+      </div>
+      <div class="text-danger" *ngIf="deviceForm.get('color')?.errors?.['pattern']">
+        Color must contain only letters
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="partNumber" class="form-label">Part Number</label>
+      <input type="number" class="form-control" id="partNumber" formControlName="part_number">
+      <div class="text-danger" *ngIf="deviceForm.get('part_number')?.errors?.['required'] && deviceForm.get('part_number')?.touched">
+        Part number is required
+      </div>
+      <div class="text-danger" *ngIf="deviceForm.get('part_number')?.errors?.['min']">
+        Part number must be greater than 0
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2" [disabled]="!deviceForm.valid">Save</button>
+    <button type="button" class="btn btn-secondary" routerLink="/devices">Cancel</button>
+  </form>
+</div>

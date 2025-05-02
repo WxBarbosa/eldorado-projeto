@@ -1,0 +1,30 @@
+<div class="container mt-4" *ngIf="device">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Device Details</h2>
+    <div>
+      <button class="btn btn-warning me-2" [routerLink]="['/devices', device.id, 'edit']">Edit</button>
+      <button class="btn btn-danger me-2" (click)="deleteDevice()">Delete</button>
+      <button class="btn btn-secondary" routerLink="/devices">Back to List</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Device Information</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <p class="mb-2"><strong>Color:</strong> {{device.color}}</p>
+          <p class="mb-2"><strong>Part Number:</strong> {{device.part_number}}</p>
+          <p class="mb-2"><strong>Category:</strong> {{category?.name || 'Unknown'}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4" *ngIf="!device">
+  <div class="alert alert-warning">
+    Device not found.
+    <a routerLink="/devices" class="alert-link">Return to devices list</a>
+  </div>
+</div>
