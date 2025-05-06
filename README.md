@@ -97,7 +97,7 @@ This project can be executed in two scenarios: locally for development and deplo
 2. Install required packages:
    ```bash
    sudo yum update -y
-   sudo yum install -y git nodejs npm mysql
+   sudo yum install -y git nodejs npm
    ```
 
 3. Install PM2 globally:
