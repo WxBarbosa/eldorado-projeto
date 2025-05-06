@@ -16,31 +16,6 @@ variable "mime_types" {
   }
 }
 
-# Backend EC2 Instance
-resource "aws_instance" "app_server" {
-  ami           = "ami-058a8a5ab36292159"
-  instance_type = "t2.micro"
-
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo yum update -y
-              # Instalar Node.js e npm
-              curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
-              sudo yum install -y nodejs
-
-              # Clonar o repositório e configurar o backend
-              git clone https://github.com/your-repo/eldorado-projeto.git /home/ec2-user/eldorado-projeto
-              cd /home/ec2-user/eldorado-projeto/backend
-
-              # Instalar dependências e iniciar o backend
-              npm install
-              nohup npm start &
-              EOF
-
-  tags = {
-    Name = "eldorado-backend-server"
-  }
-}
 
 # Security Group
 resource "aws_security_group" "app_sg" {
@@ -50,6 +25,13 @@ resource "aws_security_group" "app_sg" {
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -66,6 +48,17 @@ resource "aws_security_group" "app_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Backend EC2 Instance
+resource "aws_instance" "app_server" {
+  ami           = "ami-058a8a5ab36292159"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
+
+  tags = {
+    Name = "eldorado-backend-server"
   }
 }
 
