@@ -2,21 +2,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-
-variable "mime_types" {
-  default = {
-    htm  = "text/html"
-    html = "text/html"
-    css  = "text/css"
-    ttf  = "font/ttf"
-    js   = "application/javascript"
-    map  = "application/javascript"
-    json = "application/json"
-    ico  = "image/x-icon"
-  }
-}
-
-
 # Security Group
 resource "aws_security_group" "app_sg" {
   name        = "eldorado-backend-sg"
@@ -81,13 +66,13 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
-# RDS MySQL Instance (versão corrigida)
+# RDS MySQL Instance
 resource "aws_db_instance" "mysql" {
   allocated_storage    = 20
   engine               = "mysql"
-  identifier           = "myrdsinstance"
-  engine_version       = "5.7"
+  identifier           = "eldoradodb"
   instance_class       = "db.t3.micro"
+  engine_version       = "5.7"
   username             = "root"
   password             = "Eldorado2025"
   parameter_group_name = "default.mysql5.7"
@@ -108,6 +93,8 @@ resource "aws_s3_bucket" "frontend_bucket" {
   tags = {
     Name = "eldorado-frontend"
   }
+
+  depends_on = [aws_instance.app_server]
 }
 
 # Desbloqueio de política pública
@@ -150,29 +137,18 @@ resource "aws_s3_bucket_website_configuration" "frontend_bucket_website" {
   }
 }
 
-# Upload dos arquivos do frontend
-resource "aws_s3_object" "frontend_files" {
-  for_each = fileset("../frontend/dist/frontend/browser", "**/*")
-
-  bucket = aws_s3_bucket.frontend_bucket.id
-  key    = each.value == "index.html" ? "index.html" : each.value
-  source = "../frontend/dist/frontend/browser/${each.value}"
-
-  content_type  = lookup(var.mime_types, split(".", each.value)[length(split(".", each.value)) - 1], "application/octet-stream")
-}
-
 # Outputs
 output "backend_public_ip" {
   value       = aws_instance.app_server.public_ip
-  description = "Public IP of the backend EC2 instance"
-}
-
-output "rds_endpoint" {
-  value       = aws_db_instance.mysql.endpoint
-  description = "Endpoint of the RDS MySQL instance"
+  description = "IP público do backend"
 }
 
 output "frontend_s3_url" {
   value       = aws_s3_bucket_website_configuration.frontend_bucket_website.website_endpoint
-  description = "URL of the S3 bucket hosting the frontend"
+  description = "URL do frontend no S3"
+}
+
+output "rds_endpoint" {
+  value       = aws_db_instance.mysql.endpoint
+  description = "Endpoint do banco de dados RDS"
 }

@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:prod": "node scripts/update-env.js && ng build --configuration=production",
+    "deploy:aws": "npm run build:prod && cd ../backend && terraform output -json > ../frontend/dist/terraform-output.json && cd ../frontend && aws s3 sync dist/frontend/browser s3://eldorado-frontend-bucket"
   },
   "private": true,
   "dependencies": {
