@@ -69,17 +69,39 @@ resource "aws_security_group" "app_sg" {
   }
 }
 
+resource "aws_security_group" "rds_sg" {
+  name        = "eldorado-rds-sg"
+  description = "SG para acesso MySQL externo"
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Pode restringir ao IP da sua máquina para mais segurança
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 # RDS MySQL Instance (versão corrigida)
 resource "aws_db_instance" "mysql" {
   allocated_storage    = 20
   engine               = "mysql"
-  engine_version       = "8.0.35"
+  identifier           = "myrdsinstance"
+  engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   username             = "root"
   password             = "Eldorado2025"
-  parameter_group_name = "default.mysql8.0"
+  parameter_group_name = "default.mysql5.7"
   publicly_accessible  = true
   skip_final_snapshot  = true
+
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   tags = {
     Name = "eldorado-rds"
