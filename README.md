@@ -100,19 +100,24 @@ This project can be executed in two scenarios: locally for development and deplo
    sudo yum install -y git nodejs npm mysql
    ```
 
-3. Clone the repository:
+3. Install PM2 globally:
+   ```bash
+   sudo npm install -g pm2
+   ```
+
+4. Clone the repository:
    ```bash
    cd /home/ec2-user
    git clone https://github.com/wxbarbosa/eldorado-projeto.git
    cd eldorado-projeto/backend
    ```
 
-4. Install dependencies:
+5. Install dependencies:
    ```bash
    npm install
    ```
 
-5. Create the .env file:
+6. Create the .env file:
    ```bash
    cat > .env << EOL
    DB_HOST=<RDS_ENDPOINT>
@@ -122,15 +127,27 @@ This project can be executed in two scenarios: locally for development and deplo
    EOL
    ```
 
-6. Run database migrations:
+7. Run database migrations:
    ```bash
    node migrations/migrate.js
    ```
 
-7. Start the backend server:
+8. Start the backend server with PM2:
    ```bash
-   npm start
+   pm2 start bin/www --name "eldorado-api"
    ```
+
+9. Configure PM2 to start on system boot:
+   ```bash
+   pm2 startup
+   pm2 save
+   ```
+
+10. Useful PM2 commands:
+    - Check application status: `pm2 status`
+    - View logs: `pm2 logs eldorado-api`
+    - Restart application: `pm2 restart eldorado-api`
+    - Stop application: `pm2 stop eldorado-api`
 
 ### 4. Frontend Deployment
 1. Navigate to `frontend` directory
