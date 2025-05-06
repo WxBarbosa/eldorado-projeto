@@ -1,13 +1,25 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-const dbConfig = {
-    host: process.env.DB_HOST || 'mysql',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'example',
-    database: process.env.DB_NAME || 'eldorado'
+const getDbConfig = () => {
+    if (process.env.NODE_ENV === 'test') {
+        return {
+            host: process.env.TEST_DB_HOST || 'mysql',
+            user: process.env.TEST_DB_USER || 'root',
+            password: process.env.TEST_DB_PASSWORD || 'example',
+            database: process.env.TEST_DB_NAME || 'eldorado_test'
+        };
+    }
+    
+    return {
+        host: process.env.DB_HOST || 'mysql',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || 'example',
+        database: process.env.DB_NAME || 'eldorado'
+    };
 };
 
+const dbConfig = getDbConfig();
 const dbConnection = mysql.createConnection(dbConfig);
 
 // Handle connection errors and automatic reconnection
