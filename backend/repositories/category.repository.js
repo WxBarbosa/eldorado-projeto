@@ -2,64 +2,34 @@ const { dbConnection } = require('../config/database');
 
 class CategoryRepository {
     async findAll() {
-        return new Promise((resolve, reject) => {
-            dbConnection.query('SELECT * FROM categories', (err, results) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(results);
-            });
-        });
+        const [results] = await dbConnection.query('SELECT * FROM categories');
+        return results;
     }
 
     async findById(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.query('SELECT * FROM categories WHERE id = ?', [id], (err, results) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(results[0]);
-            });
-        });
+        const [results] = await dbConnection.query('SELECT * FROM categories WHERE id = ?', [id]);
+        return results[0];
     }
 
     async create(categoryData) {
-        return new Promise((resolve, reject) => {
-            dbConnection.query('INSERT INTO categories SET ?', categoryData, (err, results) => {
-                if (err) {
-                    return reject(err);
-                }
-                if (!results || !results.insertId) {
-                    return reject(new Error('Failed to create category'));
-                }
-                resolve({ id: results.insertId, ...categoryData });
-            });
-        });
+        const [results] = await dbConnection.query('INSERT INTO categories SET ?', [categoryData]);
+        if (!results || !results.insertId) {
+            throw new Error('Failed to create category');
+        }
+        return { id: results.insertId, ...categoryData };
     }
 
     async update(id, categoryData) {
-        return new Promise((resolve, reject) => {
-            dbConnection.query('UPDATE categories SET ? WHERE id = ?', [categoryData, id], (err, results) => {
-                if (err) {
-                    return reject(err);
-                }
-                if (!results || results.affectedRows === 0) {
-                    return resolve(null);
-                }
-                resolve({ id, ...categoryData });
-            });
-        });
+        const [results] = await dbConnection.query('UPDATE categories SET ? WHERE id = ?', [categoryData, id]);
+        if (!results || results.affectedRows === 0) {
+            return null;
+        }
+        return { id, ...categoryData };
     }
 
     async delete(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.query('DELETE FROM categories WHERE id = ?', [id], (err, results) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(results.affectedRows > 0);
-            });
-        });
+        const [results] = await dbConnection.query('DELETE FROM categories WHERE id = ?', [id]);
+        return results.affectedRows > 0;
     }
 }
 
