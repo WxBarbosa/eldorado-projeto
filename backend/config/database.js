@@ -15,46 +15,36 @@ const getDbConfig = () => {
         host: process.env.DB_HOST || 'mysql',
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASSWORD || 'example',
-        database: process.env.DB_NAME 
+        database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 0,
+        connectTimeout: 60000,
     };
 };
 
 const dbConfig = getDbConfig();
-const dbConnection = mysql.createConnection(dbConfig);
+const pool = mysql.createPool(dbConfig).promise();
 
-// Handle connection errors and automatic reconnection
-dbConnection.on('error', (err) => {
-    console.error('Database error:', err);
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-        console.log('Lost connection to MySQL server. Reconnecting...');
-        handleDisconnect();
-    } else {
-        throw err;
+// Export the promise-based pool directly
+const dbConnection = pool;
+
+// Test connection and handle reconnect
+const testConnection = async () => {
+    try {
+        // Execute a simple query to test the connection
+        await pool.query('SELECT 1');
+        console.log('Database connection established');
+    } catch (error) {
+        console.error('Error connecting to database:', error);
+        // Try to reconnect after 2 seconds
+        setTimeout(testConnection, 2000);
     }
-});
+};
 
-function handleDisconnect() {
-    const connection = mysql.createConnection(dbConfig);
-
-    connection.connect((err) => {
-        if (err) {
-            console.error('Error reconnecting to database:', err);
-            setTimeout(handleDisconnect, 2000);
-            return;
-        }
-        dbConnection.destroy();
-        Object.assign(dbConnection, connection);
-        console.log('Successfully reconnected to database');
-    });
-
-    connection.on('error', (err) => {
-        console.error('Database error:', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            handleDisconnect();
-        } else {
-            throw err;
-        }
-    });
-}
+// Initial connection test
+testConnection();
 
 module.exports = { dbConnection };

@@ -12,14 +12,16 @@ const deviceRoutes = require('./routes/device.routes');
 
 const app = express();
 
-// Database connection
-dbConnection.connect((err) => {
-    if (err) {
+// Database connection test
+(async () => {
+    try {
+        await dbConnection.execute('SELECT 1');
+        console.log('Connected to the MySQL database.');
+    } catch (err) {
         console.error('Error connecting to the database:', err);
         process.exit(1);
     }
-    console.log('Connected to the MySQL database.');
-});
+})();
 
 // Middlewares
 app.use(cors());
